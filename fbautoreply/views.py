@@ -32,8 +32,7 @@ def facebook_account_list(request, template_name='facebook-resources/facebook-ac
     if not request.user.is_authenticated():
         return redirect('home')
     facebook_accounts = FacebookAccount.objects.all().filter(user=request.user)
-    data = {}
-    data['object_list'] = facebook_accounts
+    data = {'object_list': facebook_accounts}
     return render(request, template_name, data)
 
 def facebook_account_create(request, template_name='facebook-resources/facebook-accounts/facebook_account_form.html'):
@@ -74,20 +73,27 @@ def facebook_fan_page_list(request, template_name='facebook-resources/facebook-f
                                              'JOIN fbautoreply_facebookaccount ON fbautoreply_facebookfanpage.facebook_account_id = fbautoreply_facebookaccount.id '
                                              'WHERE fbautoreply_facebookaccount.user_id = %s ', [str(request.user.id)])
 
-    data = {}
-    data['object_list'] = facebook_fan_pages
+    data = {'object_list': facebook_fan_pages}
     return render(request, template_name, data)
 
 def facebook_fan_page_new(request):
     if not request.user.is_authenticated():
         return redirect('home')
-    data1 = {}
-    data1['object_list'] = FacebookAccount.objects.all().filter(user=request.user)
+    data1 = {
+        'object_list': FacebookAccount.objects.all().filter(user=request.user)
+    }
     for facebook_account in data1['object_list']:
-        data2 = json.load(urllib2.urlopen("https://graph.facebook.com/v2.7/me/accounts?access_token="+facebook_account.ouath_token))
+        data2 = json.load(
+            urllib2.urlopen(
+                f"https://graph.facebook.com/v2.7/me/accounts?access_token={facebook_account.ouath_token}"
+            )
+        )
         for j in data2['data']:
-            data3 = {}
-            data3['object_list'] = FacebookFanPage.objects.all().filter(fan_page_id=j['id'])
+            data3 = {
+                'object_list': FacebookFanPage.objects.all().filter(
+                    fan_page_id=j['id']
+                )
+            }
             if data3['object_list'].count() == 0:
                 facebook_fan_page = FacebookFanPage()
                 facebook_fan_page.facebook_account = facebook_account
@@ -107,8 +113,7 @@ def predefined_message_list(request, template_name='predefined-message/predefine
     if not request.user.is_authenticated():
         return redirect('home')
     predefined_messages = PredefinedMessage.objects.all().filter(user=request.user)
-    data = {}
-    data['object_list'] = predefined_messages
+    data = {'object_list': predefined_messages}
     return render(request, template_name, data)
 
 def predefined_message_create(request, template_name='predefined-message/predefined_message_form.html'):
@@ -156,8 +161,7 @@ def predefined_message_detail_list(request, pk, template_name='predefined-messag
                                              'JOIN fbautoreply_predefinedmessage ON fbautoreply_predefinedmessagedetail.predefined_message_detail_id = fbautoreply_predefinedmessage.id '
                                              'WHERE fbautoreply_predefinedmessage.user_id = %s ', [str(request.user.id)])
 
-    data = {}
-    data['object_list'] = predefined_message_details
+    data = {'object_list': predefined_message_details}
     return render(request, template_name, data)
 
 def predefined_message_detail_create(request, template_name='predefined-message/predefined_message_detail_form.html'):
@@ -202,8 +206,7 @@ def autoresponder_list(request, template_name='autoresponder/autoresponder_list.
     if not request.user.is_authenticated():
         return redirect('home')
     campaigns = Campaign.objects.all().filter(user=request.user)
-    data = {}
-    data['object_list'] = campaigns
+    data = {'object_list': campaigns}
     return render(request, template_name, data)
 
 def autoresponder_create(request, template_name='autoresponder/autoresponder_form.html'):
